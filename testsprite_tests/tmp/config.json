@@ -1,0 +1,12 @@
+{
+  "status": "init",
+  "executionArgs": {
+    "projectName": "Discord_Bots",
+    "projectPath": "C:\\Users\\rafae\\OneDrive\\Projects_Work\\Discord_Bots",
+    "testIds": [],
+    "additionalInstruction": "No tests; just applying small UI text/size change in Footer.",
+    "envs": {
+      "API_KEY": "sk-user-nxUHl9Qz1fF4ZX7dGLFK2UfHOL5hs1g61yy2pOV1h40vccwYdNUby2ZShS9rmG-RjLNnS9kWaDGZLT9yI-WeNaPrkZdv2TPPcVXfkir_4fefhAUldhawzZmlqdlQd11Ks34"
+    }
+  }
+}

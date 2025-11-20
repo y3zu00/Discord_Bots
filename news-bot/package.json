@@ -1,0 +1,21 @@
+{
+  "name": "news-bot",
+  "version": "1.0.0",
+  "description": "Discord bot that posts JOAT-formatted news drops every four hours",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.82",
+    "axios": "^1.13.2",
+    "dayjs": "^1.11.19",
+    "discord.js": "^14.24.2",
+    "dotenv": "^17.2.3",
+    "node-cron": "^4.2.1",
+    "openai": "^6.9.0"
+  }
+}

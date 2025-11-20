@@ -1,0 +1,411 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* JOAT Trades Design System - Dark Theme */
+    --background: 220 40% 6%;
+    --background-end: 220 50% 3%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 35% 8%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 35% 10%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Primary = Amber/Orange CTA */
+    --primary: 28 95% 62%;
+    --primary-foreground: 220 40% 6%;
+    
+    /* Secondary = Purple accent */
+    --secondary: 270 70% 65%;
+    --secondary-foreground: 220 40% 6%;
+
+    /* Success green for checks and bullish candles */
+    --success: 142 76% 55%;
+    --success-foreground: 220 40% 6%;
+
+    /* Muted text */
+    --muted: 220 15% 25%;
+    --muted-foreground: 220 15% 65%;
+
+    /* Accent = Yellow for "Bank" */
+    --accent: 48 96% 58%;
+    --accent-foreground: 220 40% 6%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 25% 18%;
+    --input: 220 25% 18%;
+    --ring: 28 95% 62%;
+
+    --radius: 0.75rem;
+
+    /* Chart colors */
+    --chart-bullish: 142 76% 55%;
+    --chart-bearish: 0 84% 60%;
+    --chart-grid: 220 25% 15%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(220, 40%, 8%) 0%, hsl(220, 50%, 3%) 100%);
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Premium animated glow border for modal */
+  .glow-border-animated {
+    position: relative;
+    overflow: visible;
+  }
+
+  /* Thin animated ring around the OUTSIDE edge only (no inner or interior overlay) */
+  .glow-border-animated::after {
+    content: "";
+    position: absolute;
+    inset: -8px; /* sit outside the element */
+    border-radius: inherit;
+    padding: 3px; /* thicker ring */
+    background: conic-gradient(
+      from var(--gradient-angle),
+      /* two-color fade: Discord blue -> theme accent (yellow) */
+      transparent 0deg 312deg,
+      hsl(235 86% 65% / 0.00) 312deg,
+      hsl(235 86% 65% / 0.35) 326deg,
+      hsl(235 86% 65% / 0.50) 334deg,
+      hsl(var(--accent) / 0.50) 342deg,
+      hsl(var(--accent) / 0.35) 350deg,
+      hsl(var(--accent) / 0.00) 356deg,
+      transparent 356deg 360deg
+    );
+    /* Mask to keep only the ring */
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+    animation: glow-border-spin 10s linear infinite, glow-fade 3.6s ease-in-out infinite; /* slower + faded pulse */
+    z-index: 1;
+  }
+
+  /* soft outer halo for depth (outside only) */
+  .glow-border-animated::before {
+    content: "";
+    position: absolute;
+    inset: -14px; /* further outside for subtle aura */
+    border-radius: inherit;
+    background: conic-gradient(
+      from var(--gradient-angle),
+      transparent 0deg 306deg,
+      hsl(235 86% 65% / 0.12) 306deg 334deg,
+      hsl(var(--accent) / 0.12) 334deg 352deg,
+      transparent 352deg 360deg
+    );
+    filter: blur(24px);
+    opacity: 0.65;
+    pointer-events: none;
+    animation: glow-border-spin 10s linear infinite, glow-fade 3.6s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  @keyframes glow-fade {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 0.6; }
+  }
+
+  @property --gradient-angle {
+    syntax: "<angle>";
+    initial-value: 0deg;
+    inherits: false;
+  }
+
+  @keyframes glow-border-spin {
+    0% {
+      --gradient-angle: 0deg;
+    }
+    100% {
+      --gradient-angle: 360deg;
+    }
+  }
+}
+
+@layer utilities {
+  /* Spark particles for plan badges */
+  @keyframes spark-burst {
+    0% { transform: translate(0, 0) scale(1); opacity: 0.95; }
+    100% { transform: translate(var(--dx, 0px), var(--dy, -14px)) scale(0.6); opacity: 0; }
+  }
+
+  .spark-particle {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background: var(--spark-color, #ffffff);
+    border-radius: 9999px;
+    box-shadow: 0 0 6px var(--spark-color, #fff);
+    transform: translate(0, 0);
+    animation-name: spark-burst;
+    animation-iteration-count: infinite;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Themed, minimal scrollbar for elements and page */
+  .scrollbar, html, body {
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: hsl(var(--muted-foreground)) transparent;
+  }
+  .scrollbar::-webkit-scrollbar, html::-webkit-scrollbar, body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar::-webkit-scrollbar-track, html::-webkit-scrollbar-track, body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar::-webkit-scrollbar-thumb, html::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .scrollbar:hover::-webkit-scrollbar-thumb, html:hover::-webkit-scrollbar-thumb, body:hover::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground));
+  }
+
+  /* Price flash animations: fast color-in, slow fade-out; no movement */
+  @keyframes flash-up {
+    0% { color: hsl(var(--success)); opacity: 1; }
+    30% { color: hsl(var(--success)); opacity: 1; }
+    100% { color: inherit; opacity: 1; }
+  }
+  @keyframes flash-down {
+    0% { color: hsl(var(--destructive)); opacity: 1; }
+    30% { color: hsl(var(--destructive)); opacity: 1; }
+    100% { color: inherit; opacity: 1; }
+  }
+  .flash-up { animation: flash-up 1.2s cubic-bezier(0.2,0,0,1); }
+  .flash-down { animation: flash-down 1.2s cubic-bezier(0.2,0,0,1); }
+
+  /* Smooth color fade utility for price text */
+  .price-color-transition { transition: color 1.8s ease; }
+  .price-up { color: hsl(var(--success)); }
+  .price-down { color: hsl(var(--destructive)); }
+
+  /* Explicit keyframe-based color fade (in case transitions are skipped) */
+  @keyframes price-flash-up {
+    0% { color: hsl(var(--success)); }
+    40% { color: hsl(var(--success)); }
+    100% { color: inherit; }
+  }
+  @keyframes price-flash-down {
+    0% { color: hsl(var(--destructive)); }
+    40% { color: hsl(var(--destructive)); }
+    100% { color: inherit; }
+  }
+  .price-flash-up { animation: price-flash-up 2.2s ease-out; }
+  .price-flash-down { animation: price-flash-down 2.2s ease-out; }
+
+  /* Shimmer animation for topbar accent strip */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(400%);
+    }
+  }
+
+  /* Shine animation for logo hover */
+  @keyframes shine {
+    0% {
+      transform: translateX(-100%) skewX(-12deg);
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateX(300%) skewX(-12deg);
+      opacity: 0;
+    }
+  }
+
+  /* Comedown animation for cards */
+  @keyframes comedown {
+    0% {
+      opacity: 0;
+      transform: translateY(-12px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    0% {
+      opacity: 0;
+      transform: translateX(12px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  /* Hero text fade-in animation */
+  @keyframes hero-fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .hero-fade-in {
+    animation: hero-fade-in 1s ease-out forwards;
+    opacity: 0;
+  }
+  
+  .hero-fade-in-delay-1 {
+    animation: hero-fade-in 1s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+  
+  .hero-fade-in-delay-2 {
+    animation: hero-fade-in 1s ease-out 0.4s forwards;
+    opacity: 0;
+  }
+
+  .animate-comedown {
+    animation: comedown 0.4s ease-out forwards;
+  }
+
+  .animate-slide-in-right {
+    animation: slideInRight 0.4s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  /* Flowing glow gradient for chatbar */
+  @keyframes flowingGlow {
+    0% {
+      background-position: -100% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .chatbar-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chatbar-glow::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--primary) / 0.3) 20%,
+      hsl(var(--primary) / 0.6) 50%,
+      hsl(var(--primary) / 0.3) 80%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: flowingGlow 3s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .chatbar-glow::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--primary) / 0.5) 50%,
+      transparent 100%
+    );
+    filter: blur(4px);
+    animation: flowingGlow 3s ease-in-out infinite;
+    animation-delay: 0.5s;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Floating images animation */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+      opacity: 0.6;
+    }
+    50% {
+      transform: translateY(-20px) rotate(5deg);
+      opacity: 0.8;
+    }
+  }
+
+  .floating-image {
+    animation: float 6s ease-in-out infinite;
+  }
+}

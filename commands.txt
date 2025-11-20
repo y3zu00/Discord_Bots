@@ -1,0 +1,17 @@
+mentor:
+    taskkill /f /im node.exe
+    cd trading-mentor-bot
+    node index.js
+
+signal:
+    cd signals-bot
+    python main.py
+
+website:
+    cd website
+    npm run dev 
+    npm run server
+
+question daily:
+    cd question-daily-bot
+    node index.js
