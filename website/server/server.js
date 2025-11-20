@@ -11,6 +11,33 @@ import { neon } from '@neondatabase/serverless';
 import { getCompanyKnowledge } from './company-knowledge.js';
 
 const app = express();
+
+// CORS middleware - allow requests from frontend
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
+  const allowedOrigins = [
+    frontendUrl,
+    'http://localhost:8080',
+    'http://localhost:5173',
+    'https://discord-bots-zodl.vercel.app',
+    'https://discord-bots-zodl-git-main-y3zu00s-projects.vercel.app',
+    ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [])
+  ];
+  
+  if (origin && allowedOrigins.some(allowed => origin.startsWith(allowed.replace(/\/$/, '')))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-bot-key');
+  
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 // Capture raw body for webhook verification
 app.use(express.json({ verify: (req, res, buf) => { try { req.rawBody = buf; } catch {} } }));
 app.use(cookieParser());
