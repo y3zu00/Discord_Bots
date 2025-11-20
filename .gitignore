@@ -134,3 +134,7 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Large video files (exceed GitHub 100MB limit)
+*.mp4
+website/public/*.mp4
