@@ -12,7 +12,7 @@ import whaleFinderBg from "@/assets/rezerowhales.gif";
 import iceElvesBg from "@/assets/ice-elves.gif";
 import ghostedNightBg from "@/assets/ghostednight.gif";
 import sharinganSound from "@/assets/sharingan_sound_only.mp3";
-import iceArrowSound from "@/assets/ice arrow.mp3";
+import iceArrowSound from "@/assets/ice-arrow.mp3";
 import whaleSound from "@/assets/whalesound.mp3";
 import ghostWhisperSound from "@/assets/ghostwhisper.mp3";
 
