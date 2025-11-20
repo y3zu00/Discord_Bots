@@ -11,15 +11,15 @@ import codesPfp from "@/assets/joatcodespfp.png";
 import optionsPfp from "@/assets/jackofalloptions.png";
 import whaleBotPfp from "@/assets/jackofallwhales.png";
 import sharinganGif from "@/assets/sharingan-ringan.gif";
-import redsnowGif from "@/assets/redsnow2.gif";
+import redsnowGif from "@/assets/redsnow2.mp4";
 import tradingviewLogo from "@/assets/tradingviewlogo.png";
 import joatLogo from "@/assets/joat-logo-nobg.png";
 import joatText from "@/assets/joat-text.png";
 import whaleLogo from "@/assets/whalefinderpro.png";
 import skywhalesGif from "@/assets/skywhales.gif";
-import rezerowhalesGif from "@/assets/rezerowhales.gif";
+import rezerowhalesGif from "@/assets/rezerowhales.mp4";
 import iceElvesPfp from "@/assets/ice-elves.png";
-import iceElvesBg from "@/assets/ice-elves.gif";
+import iceElvesBg from "@/assets/ice-elves.mp4";
 import ghostedNightPfp from "@/assets/ghostednight.png";
 import ghostedNightBg from "@/assets/ghostednight.gif";
 
@@ -405,19 +405,30 @@ const AISystemsSection = () => {
                 }`}
                 style={{ 
                   transitionDelay: `${200 + index * 80}ms`,
-                  ...(backgroundImage
-                    ? {
-                        backgroundImage: `url(${backgroundImage})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'top center',
-                        backgroundRepeat: 'no-repeat',
-                      }
-                    : {})
                 }}
               >
                 {backgroundImage ? (
                   <>
-                    <div className="absolute inset-0 rounded-2xl z-[1] pointer-events-none" />
+                    {backgroundImage.endsWith('.mp4') ? (
+                      <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="absolute inset-0 rounded-2xl z-[1] pointer-events-none object-cover w-full h-full"
+                        src={backgroundImage}
+                      />
+                    ) : (
+                      <div
+                        className="absolute inset-0 rounded-2xl z-[1] pointer-events-none"
+                        style={{
+                          backgroundImage: `url(${backgroundImage})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'top center',
+                          backgroundRepeat: 'no-repeat',
+                        }}
+                      />
+                    )}
                     <div
                       className="absolute inset-0 rounded-2xl z-[2] opacity-0 group-hover:opacity-30 transition-opacity duration-150 pointer-events-none"
                       style={{ background: backgroundOverlay || 'linear-gradient(to bottom right, rgba(15,23,42,0.4), rgba(14,116,144,0.25))' }}

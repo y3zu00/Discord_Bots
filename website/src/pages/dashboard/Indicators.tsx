@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 import tradingviewLogo from "@/assets/tradingviewlogo.png";
 import whopLogo from "@/assets/whop.jpg";
 import sharinganGif from "@/assets/sharingan-ringan.gif";
-import redsnowGif from "@/assets/redsnow2.gif";
-import whaleFinderBg from "@/assets/rezerowhales.gif";
-import iceElvesBg from "@/assets/ice-elves.gif";
+import redsnowGif from "@/assets/redsnow2.mp4";
+import whaleFinderBg from "@/assets/rezerowhales.mp4";
+import iceElvesBg from "@/assets/ice-elves.mp4";
 import ghostedNightBg from "@/assets/ghostednight.gif";
 import sharinganSound from "@/assets/sharingan_sound_only.mp3";
 import iceArrowSound from "@/assets/ice-arrow.mp3";
@@ -247,6 +247,9 @@ const Indicators: React.FC = () => {
   );
   const detailBackgroundStyle = React.useMemo(() => {
     if (!activeIndicator?.background) return undefined;
+    if (activeIndicator.background.endsWith('.mp4')) {
+      return { hasVideo: true, videoSrc: activeIndicator.background } as any;
+    }
     return {
       backgroundImage: `linear-gradient(135deg, rgba(8,9,20,0.85), rgba(8,9,20,0.65)), url(${activeIndicator.background})`,
       backgroundSize: "cover",
@@ -376,6 +379,7 @@ const Indicators: React.FC = () => {
                     });
                   }
                 };
+                const isVideoBg = indicator.background.endsWith('.mp4');
                 return (
                   <button
                     key={indicator.id}
@@ -384,13 +388,23 @@ const Indicators: React.FC = () => {
                       "group relative isolate w-full overflow-hidden rounded-3xl border px-5 py-5 text-left transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                       isActive ? "border-white/40 shadow-lg shadow-amber-500/20" : "border-white/10 hover:border-white/25"
                     )}
-                    style={{
+                    style={!isVideoBg ? {
                       backgroundImage: `linear-gradient(135deg, rgba(6,7,16,0.85), rgba(6,10,25,0.55)), url(${indicator.background})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
-                    }}
+                    } : undefined}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-transparent to-black/20 opacity-50 transition duration-500 group-hover:opacity-80" />
+                    {isVideoBg && (
+                      <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="absolute inset-0 rounded-3xl z-0 object-cover w-full h-full"
+                        src={indicator.background}
+                      />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-transparent to-black/20 opacity-50 transition duration-500 group-hover:opacity-80 z-[1]" />
                     <div className="flex items-center justify-between gap-3">
                       <div className="space-y-1 text-white relative z-10">
                         <p className="text-xs uppercase tracking-wide text-white/70">
@@ -444,9 +458,23 @@ const Indicators: React.FC = () => {
 
           <Card
             className="border-white/10 bg-card/80 overflow-hidden relative"
-            style={detailBackgroundStyle}
+            style={detailBackgroundStyle && !detailBackgroundStyle.hasVideo ? detailBackgroundStyle : undefined}
           >
-            {detailBackgroundStyle && <div className="absolute inset-0 bg-gradient-to-br from-black/50 to-black/30 pointer-events-none" />}
+            {detailBackgroundStyle?.hasVideo ? (
+              <>
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="absolute inset-0 z-0 object-cover w-full h-full"
+                  src={detailBackgroundStyle.videoSrc}
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-black/50 to-black/30 pointer-events-none z-[1]" />
+              </>
+            ) : detailBackgroundStyle ? (
+              <div className="absolute inset-0 bg-gradient-to-br from-black/50 to-black/30 pointer-events-none z-[1]" />
+            ) : null}
             <CardHeader className="space-y-1">
               <Badge
                 variant="outline"

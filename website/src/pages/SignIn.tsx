@@ -39,8 +39,9 @@ const SignIn: React.FC = () => {
     // Get the return URL from location state
     const returnTo = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || "/dashboard";
     // Pass return URL as query parameter
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://68.183.156.170:8787';
     setTimeout(() => {
-      window.location.replace(`/api/auth/discord/login?returnTo=${encodeURIComponent(returnTo)}`);
+      window.location.replace(`${apiUrl}/api/auth/discord/login?returnTo=${encodeURIComponent(returnTo)}`);
     }, 10);
   };
 
