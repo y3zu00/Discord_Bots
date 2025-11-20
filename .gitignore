@@ -136,5 +136,4 @@ dist
 .pnp.*
 
 # Large video files (exceed GitHub 100MB limit)
-*.mp4
-website/public/*.mp4
+website/public/Introducing Jack Of All Trades.mp4
