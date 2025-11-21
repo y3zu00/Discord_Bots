@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, DollarSign, Activity, Bell, Bookmark, Briefcase } from "lucide-react";
 import { getSession } from "@/lib/session";
 import { Skeleton } from "@/components/ui/skeleton";
+import { apiFetch } from "@/lib/api";
 
 type DashboardNotification = {
   id: string;
@@ -90,10 +91,10 @@ const Overview: React.FC = () => {
     (async () => {
       try {
         const [wlRes, alRes, pfRes, scRes] = await Promise.all([
-          fetch('/api/watchlist', { credentials: 'include' }).catch(() => null),
-          fetch('/api/alerts', { credentials: 'include' }).catch(() => null),
-          fetch('/api/portfolio', { credentials: 'include' }).catch(() => null),
-          fetch('/api/stats/signals/count', { credentials: 'include' }).catch(() => null),
+          apiFetch('/api/watchlist').catch(() => null),
+          apiFetch('/api/alerts').catch(() => null),
+          apiFetch('/api/portfolio').catch(() => null),
+          apiFetch('/api/stats/signals/count').catch(() => null),
         ]);
         if (!cancelled) {
           try {
@@ -115,7 +116,7 @@ const Overview: React.FC = () => {
               if (typeof d?.count === 'number') setTotalSignalsCount(d.count);
             }
             if (!scRes || !scRes.ok) {
-              const alt = await fetch('/api/signals?limit=100', { credentials: 'include' }).then(r => r.ok ? r.json() : { items: [] }).catch(() => ({ items: [] }));
+              const alt = await apiFetch('/api/signals?limit=100').then(r => r.ok ? r.json() : { items: [] }).catch(() => ({ items: [] }));
               setTotalSignalsCount(Array.isArray(alt?.items) ? alt.items.length : 0);
             }
           } catch {}
@@ -133,7 +134,7 @@ const Overview: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/metrics', { credentials: 'include' });
+        const res = await apiFetch('/api/metrics');
         if (res.ok) {
           const d = await res.json();
           if (!cancelled) {
@@ -351,7 +352,7 @@ const Overview: React.FC = () => {
       try {
         let items: any[] = [];
         try {
-          const res = await fetch('/api/signals?limit=5', { credentials: 'include' });
+          const res = await apiFetch('/api/signals?limit=5');
           if (res.ok) {
             const data = await res.json();
             items = Array.isArray(data?.items) ? data.items : [];
@@ -359,7 +360,7 @@ const Overview: React.FC = () => {
         } catch {}
         if (!items || items.length === 0) {
           try {
-            const res2 = await fetch('/api/market?limit=5', { credentials: 'include' });
+            const res2 = await apiFetch('/api/market?limit=5');
             if (res2.ok) {
               const data2 = await res2.json();
               items = Array.isArray(data2?.items) ? data2.items : [];
@@ -391,7 +392,7 @@ const Overview: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/news', { credentials: 'include' });
+        const res = await apiFetch('/api/news');
         if (!res.ok) return;
         const data = await res.json();
         const arr = Array.isArray(data?.items) ? data.items : [];

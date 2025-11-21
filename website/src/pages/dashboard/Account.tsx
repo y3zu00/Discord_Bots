@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -397,7 +398,7 @@ const Account: React.FC = () => {
 
   const loadPortfolio = useCallback(async () => {
     try {
-      const res = await fetch('/api/portfolio', { credentials: 'include' });
+      const res = await apiFetch('/api/portfolio');
       if (!res.ok) return;
       const data = await res.json();
       const items = Array.isArray(data?.items) ? data.items : [];
@@ -479,7 +480,7 @@ const Account: React.FC = () => {
           },
         },
       };
-      const res = await fetch('/api/preferences', {
+      const res = await apiFetch('/api/preferences', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -512,7 +513,7 @@ const Account: React.FC = () => {
   const handleTradingProfileSave = useCallback(async () => {
     setProfileSaving(true);
     try {
-      const res = await fetch('/api/profile/trading', {
+      const res = await apiFetch('/api/profile/trading', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -536,7 +537,7 @@ const Account: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/alerts', { credentials: 'include' });
+        const res = await apiFetch('/api/alerts');
         if (!res.ok) {
           setAlertsCount(0);
           return;
@@ -553,7 +554,7 @@ const Account: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/profile/trading', { credentials: 'include' });
+        const res = await apiFetch('/api/profile/trading', { credentials: 'include' });
         if (!res.ok) return;
         const data = await res.json();
         if (data?.profile) {
@@ -567,7 +568,7 @@ const Account: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/trial/status', { credentials: 'include' });
+        const res = await apiFetch('/api/trial/status');
         if (res.ok) {
           const data = await res.json();
           setTrial({ active: !!data.active, endsAt: data.endsAt || null, trialUsed: !!data.trialUsed });
@@ -580,7 +581,7 @@ const Account: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/preferences', { credentials: 'include' });
+        const res = await apiFetch('/api/preferences', { credentials: 'include' });
         if (!res.ok) return;
         const data = await res.json();
         const prefs = (data?.preferences || {}) as any;
@@ -603,7 +604,7 @@ const Account: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/preferences', { credentials: 'include' });
+        const res = await apiFetch('/api/preferences', { credentials: 'include' });
         if (!res.ok) return;
         const data = await res.json();
         const general = (data?.preferences?.general || {}) as Record<string, any>;
@@ -639,7 +640,7 @@ const Account: React.FC = () => {
   const handleSave = async () => {
     // Persist username on server so it survives reload and cookie hydration
     try {
-      const res = await fetch('/api/profile', {
+      const res = await apiFetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -677,7 +678,7 @@ const Account: React.FC = () => {
 
   const persistPreferences = useCallback(async (notifications: typeof formData.notifications, privacy = formData.privacy) => {
     try {
-      await fetch('/api/preferences', {
+      await apiFetch('/api/preferences', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -867,7 +868,7 @@ const Account: React.FC = () => {
                       size="sm"
                       onClick={async () => {
                         try {
-                          const res = await fetch('/api/trial/start', { method: 'POST', credentials: 'include' });
+                          const res = await apiFetch('/api/trial/start', { method: 'POST' });
                           const data = await res.json();
                           if (res.ok) {
                             setTrial({ active: true, endsAt: data.endsAt || null, trialUsed: true });
@@ -1384,7 +1385,7 @@ const Account: React.FC = () => {
                 onClick={async () => {
                   setEraseLoading(true);
                   try {
-                    const res = await fetch('/api/account/erase', {
+                    const res = await apiFetch('/api/account/erase', {
                       method: 'POST',
                       credentials: 'include',
                     });

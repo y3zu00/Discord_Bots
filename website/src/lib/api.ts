@@ -25,3 +25,18 @@ export async function apiFetch(path: string, options?: RequestInit): Promise<Res
   });
 }
 
+/**
+ * Get the WebSocket URL for real-time connections
+ */
+export function getWebSocketUrl(): string {
+  const baseUrl = getApiUrl();
+  if (baseUrl) {
+    // Production: use VITE_API_URL, convert http/https to ws/wss
+    const wsBase = baseUrl.replace(/^http/, 'ws');
+    return `${wsBase}/ws`;
+  }
+  // Development: use current location
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${window.location.host}/ws`;
+}
+

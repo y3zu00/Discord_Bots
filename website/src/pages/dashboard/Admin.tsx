@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { apiFetch } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -48,17 +49,17 @@ const Admin: React.FC = () => {
 
   const loadAll = React.useCallback(async () => {
     try {
-      const a = await fetch('/api/announcements', { credentials: 'include' }).then(r=>r.json());
+      const a = await apiFetch('/api/announcements').then(r=>r.json());
       setAnn(Array.isArray(a?.items) ? a.items : []);
     } catch {}
     try {
-      const u = await fetch('/api/admin/users', { credentials: 'include' }).then(r=>r.json());
+      const u = await apiFetch('/api/admin/users').then(r=>r.json());
       setUsers(Array.isArray(u?.items) ? u.items : []);
     } catch {}
     try {
       const [mentor, feedback] = await Promise.all([
-        fetch('/api/admin/mentor-feedback', { credentials: 'include' }).then(r => r.json()).catch(() => null),
-        fetch('/api/admin/feedback', { credentials: 'include' }).then(r => r.json()).catch(() => null),
+        apiFetch('/api/admin/mentor-feedback').then(r => r.json()).catch(() => null),
+        apiFetch('/api/admin/feedback').then(r => r.json()).catch(() => null),
       ]);
       setMentorFeedback(Array.isArray(mentor?.items) ? mentor.items : []);
       setUserFeedback(Array.isArray(feedback?.items) ? feedback.items : []);
@@ -105,7 +106,7 @@ const Admin: React.FC = () => {
   const createAnnouncement = async () => {
     if (!title.trim()) return;
     try {
-      const res = await fetch('/api/announcements', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, body, audience }) });
+      const res = await apiFetch('/api/announcements', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title, body, audience }) });
       if (res.ok) { setTitle(""); setBody(""); toast.success('Announcement posted'); loadAll(); }
       else toast.error('Failed');
     } catch { toast.error('Failed'); }
@@ -216,13 +217,13 @@ const Admin: React.FC = () => {
   };
 
   const handleDevLogin = async () => {
-    try { await fetch('/api/logout', { method: 'POST' }); } catch {}
+    try { await apiFetch('/api/logout', { method: 'POST' }); } catch {}
     createDevSession();
     window.location.href = "/dashboard";
   };
 
   const handleVariant = async (plan: "Free" | "Core" | "Pro" | "Elite") => {
-    try { await fetch('/api/logout', { method: 'POST' }); } catch {}
+    try { await apiFetch('/api/logout', { method: 'POST' }); } catch {}
     createDevSessionForPlan(plan);
     window.location.href = "/dashboard";
   };

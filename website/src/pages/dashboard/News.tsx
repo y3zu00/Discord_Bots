@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowUpRight } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 const News: React.FC = () => {
   const [items, setItems] = React.useState<Array<any>>([]);
@@ -18,7 +19,7 @@ const News: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/news', { credentials: 'include' });
+        const res = await apiFetch('/api/news');
         if (res.ok) {
           const data = await res.json();
           if (!cancelled) setItems(data?.items || []);
@@ -40,7 +41,7 @@ const News: React.FC = () => {
     const id = setInterval(async () => {
       setRefreshing(true);
       try {
-        const res = await fetch('/api/news', { credentials: 'include' });
+        const res = await apiFetch('/api/news');
         if (res.ok) {
           const data = await res.json();
           setItems(data?.items || []);

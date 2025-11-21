@@ -6,6 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { getSession } from "@/lib/session";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
 
 type Announcement = { id:number; title:string; body?:string; created_at:string; audience?:string };
 type SignalNotification = {
@@ -199,7 +200,7 @@ const Notifications: React.FC = () => {
     let cancel = false;
     (async () => {
       try {
-        const res = await fetch('/api/announcements', { credentials: 'include' });
+        const res = await apiFetch('/api/announcements');
         const data = await res.json();
         if (!cancel && Array.isArray(data?.items)) setAnnouncements(data.items);
       } catch {}
@@ -211,7 +212,7 @@ const Notifications: React.FC = () => {
     let cancel = false;
     (async () => {
       try {
-        const res = await fetch('/api/preferences', { credentials: 'include' });
+        const res = await apiFetch('/api/preferences');
         if (!res.ok) throw new Error('prefs');
         const data = await res.json();
         const tz = data?.preferences?.general?.timezone;

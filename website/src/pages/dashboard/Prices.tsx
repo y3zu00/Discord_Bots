@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import CoinDetails from "@/components/CoinDetails";
 import { BookmarkPlus } from "lucide-react";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api";
 
 const CellPct: React.FC<{ v?: number }> = ({ v }) => {
   if (typeof v !== 'number' || !isFinite(v)) return <span className="tabular-nums">—</span>;
@@ -185,7 +186,7 @@ const Prices: React.FC = () => {
     if (addingSymbol === symbol) return;
     setAddingSymbol(symbol);
     try {
-      const res = await fetch('/api/watchlist', {
+      const res = await apiFetch('/api/watchlist', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -281,7 +282,7 @@ const Prices: React.FC = () => {
 
     const id = setInterval(async () => {
       try {
-        const res = await fetch(`/api/metrics?_=${Date.now()}`, { credentials: 'include', cache: 'no-store' });
+        const res = await apiFetch(`/api/metrics?_=${Date.now()}`, { cache: 'no-store' });
         const data = await res.json();
         if (!cancelled) {
           setMetrics(data || null);

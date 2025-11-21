@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import Sparkline from "@/components/ui/sparkline";
 import { Bell, Plus, TrendingUp, TrendingDown, Settings } from "lucide-react";
+import { apiFetch, getWebSocketUrl } from "@/lib/api";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -68,7 +69,7 @@ const Watchlist: React.FC = () => {
   React.useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/watchlist', { credentials: 'include' });
+        const res = await apiFetch('/api/watchlist');
         if (!res.ok) return;
         const data = await res.json();
         if (Array.isArray(data?.items) && data.items.length >= 0) {
@@ -94,9 +95,8 @@ const Watchlist: React.FC = () => {
   async function persistOrder(list: WLItem[]) {
     try {
       await Promise.all(list.map(async (it, idx) => {
-        const res = await fetch('/api/watchlist', {
+        const res = await apiFetch('/api/watchlist', {
           method: 'POST',
-          credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ symbol: getBaseSymbol(it.symbol), position: idx })
         });
@@ -123,9 +123,8 @@ const Watchlist: React.FC = () => {
     }
     if (!silent) setAddingSymbol(true);
     try {
-      const res = await fetch('/api/watchlist', {
+      const res = await apiFetch('/api/watchlist', {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ symbol: asset.symbol || candidate }),
       });
@@ -235,7 +234,7 @@ const Watchlist: React.FC = () => {
   // Live updates for crypto via WS (fallback remains 30s polling)
   React.useEffect(() => {
     try {
-      const ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+      const ws = new WebSocket(getWebSocketUrl());
       wsRef.current = ws;
       ws.onopen = () => {
         const symbols = Array.from(new Set(items.map(i => getBaseSymbol(i.symbol))));
@@ -325,7 +324,7 @@ const Watchlist: React.FC = () => {
     const next = items.filter((_, i) => i !== idx);
     setItems(next);
     try { localStorage.setItem('joat:watchlist', JSON.stringify(next)); } catch {}
-    (async () => { try { await fetch('/api/watchlist', { method: 'DELETE', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ symbol: getBaseSymbol(removed.symbol) }) }); } catch {} })();
+    (async () => { try { await apiFetch('/api/watchlist', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ symbol: getBaseSymbol(removed.symbol) }) }); } catch {} })();
     setPendingRemove(null);
     toast.success(`${removed?.symbol || 'Item'} removed`);
   };

@@ -1,5 +1,6 @@
 import React from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
+import { getWebSocketUrl } from "@/lib/api";
 import {
   Sidebar,
   SidebarContent,
@@ -351,7 +352,7 @@ const DashboardLayout: React.FC = () => {
     if (!session) return;
     let ws: WebSocket | null = null;
     try {
-      ws = new WebSocket(`${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`);
+      ws = new WebSocket(getWebSocketUrl());
     } catch (error) {
       console.error('Failed to initialize notification websocket', error);
       return;

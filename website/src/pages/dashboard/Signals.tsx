@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { formatDistanceToNowStrict } from "date-fns";
 import { cn } from "@/lib/utils";
+import { apiFetch, getWebSocketUrl } from "@/lib/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -400,7 +401,7 @@ const Signals: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-      const res = await fetch(`/api/signals?limit=40`, { credentials: "include" });
+      const res = await apiFetch(`/api/signals?limit=40`);
       if (!res.ok) throw new Error(await res.text());
       const payload = (await res.json()) as { items?: unknown };
       const normalized = Array.isArray(payload?.items)
@@ -420,7 +421,7 @@ const Signals: React.FC = () => {
     let mounted = true;
     (async () => {
       try {
-        const res = await fetch("/api/session", { credentials: "include" });
+        const res = await apiFetch("/api/session");
         const data = (await res.json()) as { session?: { isAdmin?: boolean } };
         if (data?.session?.isAdmin) setIsAdmin(true);
       } catch (error) {
@@ -433,7 +434,7 @@ const Signals: React.FC = () => {
 
   useEffect(() => {
     try {
-      const ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`);
+      const ws = new WebSocket(getWebSocketUrl());
       wsRef.current = ws;
       ws.onmessage = (event) => {
         try {
@@ -714,7 +715,7 @@ const Signals: React.FC = () => {
     e?.stopPropagation();
     try {
       const baseSymbol = baseSym(signal.rawSymbol || signal.symbol);
-      const res = await fetch('/api/watchlist', {
+      const res = await apiFetch('/api/watchlist', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -809,9 +810,8 @@ const Signals: React.FC = () => {
         targets,
         stop,
       } as any;
-      const res = await fetch("/api/signals", {
+      const res = await apiFetch("/api/signals", {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });

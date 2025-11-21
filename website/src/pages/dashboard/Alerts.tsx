@@ -12,6 +12,7 @@ import { Pause, Play, Settings2, BellRing, Clock, Repeat, Trash2, Bell, Search, 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import AssetSearchDialog, { AssetSearchResult } from "@/components/AssetSearchDialog";
+import { apiFetch } from "@/lib/api";
 // Fallback logo remains the bell icon; attempt to resolve per-symbol logos via /api/coins
 
 type AlertItem = {
@@ -83,7 +84,7 @@ const Alerts: React.FC = () => {
 
   const loadAlerts = React.useCallback(async (allowLegacy = true) => {
     try {
-      const res = await fetch('/api/alerts', { credentials: 'include' });
+      const res = await apiFetch('/api/alerts');
       if (!res.ok) return;
       const data = await res.json();
       if (Array.isArray(data?.items) && data.items.length > 0) {
@@ -97,9 +98,8 @@ const Alerts: React.FC = () => {
           if (Array.isArray(legacy) && legacy.length > 0) {
             for (const legacyAlert of legacy) {
               try {
-                await fetch('/api/alerts', {
+                await apiFetch('/api/alerts', {
                   method: 'POST',
-                  credentials: 'include',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     symbol: legacyAlert.symbol,
@@ -232,9 +232,8 @@ const Alerts: React.FC = () => {
       cooldown: item.cooldown,
       active: item.active,
     };
-    const res = await fetch('/api/alerts', {
+    const res = await apiFetch('/api/alerts', {
       method: 'POST',
-      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });

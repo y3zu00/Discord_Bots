@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api";
 import { 
   Send, 
   Bot, 
@@ -336,7 +337,7 @@ const Mentor: React.FC = () => {
     let cancel = false;
     const loadServerHistory = async () => {
       try {
-        const res = await fetch('/api/mentor/chat/history', { credentials: 'include' });
+        const res = await apiFetch('/api/mentor/chat/history');
         if (!res.ok) throw new Error('history_failed');
         const data = await res.json();
         if (cancel) return;
@@ -416,7 +417,7 @@ const Mentor: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/profile/trading', { credentials: 'include' });
+        const res = await apiFetch('/api/profile/trading');
         if (!res.ok) return;
         const data = await res.json();
         if (data?.profile) {
@@ -462,7 +463,7 @@ const Mentor: React.FC = () => {
     const controller = new AbortController();
     const timeout = window.setTimeout(async () => {
       try {
-        const res = await fetch('/api/mentor/chat/settings', {
+        const res = await apiFetch('/api/mentor/chat/settings', {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -755,7 +756,7 @@ const Mentor: React.FC = () => {
   ) => {
     if (!response || !response.trim()) return;
     try {
-      await fetch('/api/mentor/feedback', {
+      await apiFetch('/api/mentor/feedback', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -828,7 +829,7 @@ const Mentor: React.FC = () => {
     abortControllerRef.current = controller;
 
     try {
-      const res = await fetch('/api/mentor/chat', {
+      const res = await apiFetch('/api/mentor/chat', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -983,7 +984,7 @@ const Mentor: React.FC = () => {
 
   const loadPortfolio = useCallback(async () => {
     try {
-      const res = await fetch('/api/portfolio', { credentials: 'include' });
+      const res = await apiFetch('/api/portfolio');
       if (!res.ok) return;
       const data = await res.json();
       const items = Array.isArray(data?.items) ? data.items : [];
@@ -1133,7 +1134,7 @@ const Mentor: React.FC = () => {
     }
     setPinnedMap(nextMap);
     try { localStorage.setItem(pinsKey, JSON.stringify(Object.keys(nextMap))); } catch {}
-    fetch('/api/mentor/chat/pin', {
+    apiFetch('/api/mentor/chat/pin', {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -1157,7 +1158,7 @@ const Mentor: React.FC = () => {
     setPinnedMap({});
     try { localStorage.removeItem(pinsKey); } catch {}
     ids.forEach((id) => {
-      fetch('/api/mentor/chat/pin', {
+      apiFetch('/api/mentor/chat/pin', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -1263,7 +1264,7 @@ const Mentor: React.FC = () => {
     const welcome = createWelcomeMessage();
     setMessages([welcome]);
     localStorage.setItem(chatKey, JSON.stringify([welcome]));
-    fetch('/api/mentor/chat/history', { method: 'DELETE', credentials: 'include' }).catch((err) => {
+    apiFetch('/api/mentor/chat/history', { method: 'DELETE' }).catch((err) => {
       console.warn('mentor_history_clear_failed', err);
     });
     setClearConfirmOpen(false);

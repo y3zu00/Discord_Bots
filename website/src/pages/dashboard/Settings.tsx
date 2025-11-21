@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Loader2, Globe, Coins, Clock, Sparkles, BookOpen, ExternalLink } from "lucide-react";
+import { apiFetch } from "@/lib/api";
 
 type GeneralPreferences = {
   timezone: string;
@@ -56,7 +57,7 @@ const SettingsPage: React.FC = () => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/preferences', { credentials: 'include' });
+        const res = await apiFetch('/api/preferences');
         if (!res.ok) throw new Error('failed');
         const data = await res.json();
         const general = (data?.preferences?.general || {}) as Partial<GeneralPreferences>;
