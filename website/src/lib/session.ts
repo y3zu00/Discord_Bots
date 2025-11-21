@@ -1,3 +1,5 @@
+import { apiFetch } from "./api";
+
 export type Session = {
   userId: string;
   username: string;
@@ -81,9 +83,7 @@ export function createDevSessionForPlan(plan: "Free" | "Core" | "Pro" | "Elite")
 // Fetch session from backend if cookie is present
 export async function syncSessionFromServer(): Promise<Session | null> {
   try {
-    const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'http://68.183.156.170:8787');
-    const url = apiUrl ? `${apiUrl}/api/session` : '/api/session';
-    const res = await fetch(url, { credentials: "include" });
+    const res = await apiFetch("/api/session");
     if (!res.ok) return null;
     const data = await res.json();
     if (data && (data as any).session) {

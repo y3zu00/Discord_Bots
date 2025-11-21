@@ -489,7 +489,7 @@ function setSessionCookie(res, payload) {
   const token = jwt.sign(clean, SESSION_SECRET, { expiresIn: '7d' });
   res.cookie('joat_session', token, {
     httpOnly: true,
-    sameSite: COOKIE_SECURE ? 'strict' : 'lax',
+    sameSite: COOKIE_SECURE ? 'none' : 'lax',
     secure: COOKIE_SECURE,
     path: '/',
     maxAge: 7 * 24 * 60 * 60 * 1000,
