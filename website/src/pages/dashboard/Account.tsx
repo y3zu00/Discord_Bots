@@ -449,9 +449,8 @@ const Account: React.FC = () => {
     try {
       const method = portfolioForm.id ? 'PATCH' : 'POST';
       const url = portfolioForm.id ? `/api/portfolio/${portfolioForm.id}` : '/api/portfolio';
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
@@ -554,7 +553,7 @@ const Account: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiFetch('/api/profile/trading', { credentials: 'include' });
+        const res = await apiFetch('/api/profile/trading');
         if (!res.ok) return;
         const data = await res.json();
         if (data?.profile) {
@@ -581,7 +580,7 @@ const Account: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiFetch('/api/preferences', { credentials: 'include' });
+        const res = await apiFetch('/api/preferences');
         if (!res.ok) return;
         const data = await res.json();
         const prefs = (data?.preferences || {}) as any;
@@ -604,7 +603,7 @@ const Account: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiFetch('/api/preferences', { credentials: 'include' });
+        const res = await apiFetch('/api/preferences');
         if (!res.ok) return;
         const data = await res.json();
         const general = (data?.preferences?.general || {}) as Record<string, any>;

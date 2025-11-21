@@ -9,7 +9,7 @@ export function getApiUrl(): string {
     return '';
   }
   // In production, use the backend URL from environment variable
-  return import.meta.env.VITE_API_URL || 'http://68.183.156.170:8787';
+  return import.meta.env.VITE_API_URL || 'https://app.jackofalltrades.vip';
 }
 
 /**
@@ -32,7 +32,7 @@ export function getWebSocketUrl(): string {
   const baseUrl = getApiUrl();
   if (baseUrl) {
     // Production: use VITE_API_URL, convert http/https to ws/wss
-    const wsBase = baseUrl.replace(/^http/, 'ws');
+    const wsBase = baseUrl.replace(/^https/, 'wss').replace(/^http/, 'ws');
     return `${wsBase}/ws`;
   }
   // Development: use current location

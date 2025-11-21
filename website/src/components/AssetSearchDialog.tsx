@@ -4,6 +4,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
 
 export type AssetSearchResult = {
   symbol: string;
@@ -55,7 +56,7 @@ const AssetSearchDialog: React.FC<Props> = ({ open, onOpenChange, onSelect, init
         const endpoint = query?.trim()
           ? `/api/assets/search?q=${encodeURIComponent(query.trim())}`
           : `/api/assets/search`;
-        const res = await fetch(endpoint, { credentials: "include", signal: controller.signal });
+        const res = await apiFetch(endpoint, { signal: controller.signal });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           throw new Error(typeof data?.error === "string" ? data.error : "Failed to search assets");

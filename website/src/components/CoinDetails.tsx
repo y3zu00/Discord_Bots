@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Sparkline from "@/components/ui/sparkline";
+import { apiFetch } from "@/lib/api";
 
 type Props = { symbol: string | null; open: boolean; onOpenChange: (v:boolean)=>void };
 
@@ -26,7 +27,7 @@ const CoinDetails: React.FC<Props> = ({ symbol, open, onOpenChange }) => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/coin?symbol=${encodeURIComponent(sym)}`, { credentials: 'include' });
+        const res = await apiFetch(`/api/coin?symbol=${encodeURIComponent(sym)}`);
         if (!res.ok) {
           const errorData = await res.json().catch(() => ({}));
           if (res.status === 429) {
@@ -43,14 +44,14 @@ const CoinDetails: React.FC<Props> = ({ symbol, open, onOpenChange }) => {
         }
       }
       try {
-        const rn = await fetch(`/api/news?symbol=${encodeURIComponent(sym)}`, { credentials: 'include' });
+        const rn = await apiFetch(`/api/news?symbol=${encodeURIComponent(sym)}`);
         if (rn.ok) {
           const dn = await rn.json();
           let items = Array.isArray(dn?.items) ? dn.items : [];
           // Fallback to general trending news if symbol-specific is empty
           if ((!items || items.length === 0)) {
             try {
-              const r2 = await fetch(`/api/news`, { credentials: 'include' });
+              const r2 = await apiFetch(`/api/news`);
               if (r2.ok) {
                 const d2 = await r2.json();
                 items = Array.isArray(d2?.items) ? d2.items : [];

@@ -3,6 +3,7 @@ import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getSession, isAuthenticated } from "@/lib/session";
+import { getApiUrl } from "@/lib/api";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 
@@ -39,7 +40,7 @@ const SignIn: React.FC = () => {
     // Get the return URL from location state
     const returnTo = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || "/dashboard";
     // Pass return URL as query parameter
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://68.183.156.170:8787';
+    const apiUrl = getApiUrl();
     setTimeout(() => {
       window.location.replace(`${apiUrl}/api/auth/discord/login?returnTo=${encodeURIComponent(returnTo)}`);
     }, 10);

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { apiFetch } from "@/lib/api";
 
 type PortfolioPositionInput = {
   id: number;
@@ -75,7 +76,7 @@ export function usePortfolioPricing(positions: PortfolioPositionInput[]): {
     (async () => {
       try {
         const qs = encodeURIComponent(uniqueSymbols.join(','));
-        const res = await fetch(`/api/coins?symbols=${qs}`, { credentials: 'include', signal: controller.signal });
+        const res = await apiFetch(`/api/coins?symbols=${qs}`, { signal: controller.signal });
         if (!res.ok) throw new Error('failed');
         const data = await res.json();
         const map: FetchState = {};

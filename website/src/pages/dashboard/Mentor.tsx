@@ -1077,9 +1077,8 @@ const Mentor: React.FC = () => {
     try {
       const method = portfolioForm.id ? 'PATCH' : 'POST';
       const url = portfolioForm.id ? `/api/portfolio/${portfolioForm.id}` : '/api/portfolio';
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });

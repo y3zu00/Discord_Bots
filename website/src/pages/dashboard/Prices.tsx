@@ -335,7 +335,7 @@ const Prices: React.FC = () => {
   const refreshCrypto = async () => {
     setLoadingC(true);
     try {
-      const res = await fetch(`/api/prices/crypto?limit=100&_=${Date.now()}`, { credentials: 'include', cache: 'no-store' });
+      const res = await apiFetch(`/api/prices/crypto?limit=100&_=${Date.now()}`, { cache: 'no-store' });
       if (res.status === 429) {
         const payload = await res.json().catch(() => ({}));
         toast.error(typeof payload?.error === 'string' ? payload.error : 'Rate limited. Please try again soon.');
