@@ -13,30 +13,56 @@ import { getCompanyKnowledge } from './company-knowledge.js';
 
 const app = express();
 
-// CORS middleware - allow requests from frontend
+// CORS middleware - allow requests from frontend (local, Vercel, and custom domains)
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:8080';
-  const allowedOrigins = [
-    frontendUrl,
-    'http://localhost:8080',
-    'http://localhost:5173',
-    'https://discord-bots-zodl.vercel.app',
-    'https://discord-bots-zodl-git-main-y3zu00s-projects.vercel.app',
-    'https://app.jackofalltrades.vip',
-    'https://docs.jackofalltrades.vip',
-    'https://www.jackofalltrades.vip',
-    'https://jackofalltrades.vip',
-    ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [])
-  ];
-  
-  if (origin && allowedOrigins.some(allowed => origin.startsWith(allowed.replace(/\/$/, '')))) {
+
+  const extraAllowed = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+
+  let isAllowed = false;
+
+  if (origin) {
+    // Local development (localhost / 127.0.0.1)
+    if (
+      origin.startsWith('http://localhost:') ||
+      origin.startsWith('http://127.0.0.1:')
+    ) {
+      isAllowed = true;
+    }
+    // Any Vercel preview / production domain
+    else if (origin.endsWith('.vercel.app')) {
+      isAllowed = true;
+    }
+    // Primary frontend URL from env
+    else if (origin === frontendUrl) {
+      isAllowed = true;
+    }
+    // Custom domains
+    else if (
+      origin === 'https://app.jackofalltrades.vip' ||
+      origin === 'https://docs.jackofalltrades.vip' ||
+      origin === 'https://www.jackofalltrades.vip' ||
+      origin === 'https://jackofalltrades.vip'
+    ) {
+      isAllowed = true;
+    }
+    // Any explicitly allowed origin from env
+    else if (extraAllowed.includes(origin)) {
+      isAllowed = true;
+    }
+  }
+
+  if (isAllowed && origin) {
     res.setHeader('Access-Control-Allow-Origin', origin);
   }
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-bot-key');
-  
+
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
