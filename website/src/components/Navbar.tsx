@@ -18,6 +18,7 @@ import {
 import joatLogo from "@/assets/joat-logo-nobg.png";
 import joatText from "@/assets/joat-text.png";
 import ParticleBackground from "@/components/ParticleBackground";
+import { getApiUrl } from "@/lib/api";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -293,7 +294,8 @@ const Navbar = () => {
             setAuthRedirecting(true);
             // Slight delay to allow overlay to paint before navigating
             setTimeout(() => {
-              window.location.replace("/api/auth/discord/login");
+              const apiUrl = getApiUrl();
+              window.location.replace(`${apiUrl}/api/auth/discord/login`);
             }, 10);
           }}
         >
