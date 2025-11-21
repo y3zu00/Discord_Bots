@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
+import { apiFetch } from "@/lib/api";
 
 type TOSAcceptanceModalProps = {
   open: boolean;
@@ -60,9 +61,8 @@ const TOSAcceptanceModal: React.FC<TOSAcceptanceModalProps> = ({ open, onAccepte
         headers["x-dev-user-id"] = sessionUserId;
       }
 
-      const res = await fetch("/api/preferences", {
+      const res = await apiFetch("/api/preferences", {
         method: "POST",
-        credentials: "include",
         headers,
         body: JSON.stringify({
           preferences: {

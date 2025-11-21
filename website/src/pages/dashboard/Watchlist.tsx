@@ -213,7 +213,7 @@ const Watchlist: React.FC = () => {
       const next = { ...metaBySymbol } as Record<string, CoinMeta>;
       for (const s of toFetch) {
         try {
-          const res = await fetch(`/api/coin?symbol=${encodeURIComponent(s)}`, { credentials: 'include' });
+          const res = await apiFetch(`/api/coin?symbol=${encodeURIComponent(s)}`);
           if (!res.ok) {
             // avoid retry storms on server 500s
             continue;
@@ -285,7 +285,7 @@ const Watchlist: React.FC = () => {
       const symbols = items.map(i => getBaseSymbol(i.symbol));
       try {
         const qs = encodeURIComponent(symbols.join(','));
-        const res = await fetch(`/api/coins?symbols=${qs}`, { credentials: 'include' });
+        const res = await apiFetch(`/api/coins?symbols=${qs}`);
         if (!res.ok) return;
         const data = await res.json();
         const next = { ...metaBySymbol } as Record<string, CoinMeta>;

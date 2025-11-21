@@ -118,9 +118,8 @@ const SettingsPage: React.FC = () => {
           }
         }
       };
-      const res = await fetch('/api/preferences', {
+      const res = await apiFetch('/api/preferences', {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });

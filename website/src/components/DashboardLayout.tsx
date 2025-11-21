@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { getWebSocketUrl } from "@/lib/api";
+import { getWebSocketUrl, apiFetch } from "@/lib/api";
 import {
   Sidebar,
   SidebarContent,
@@ -136,8 +136,7 @@ const DashboardLayout: React.FC = () => {
           headers['x-dev-user-id'] = sessionUserId;
         }
         
-        const res = await fetch('/api/preferences', { 
-          credentials: 'include',
+        const res = await apiFetch('/api/preferences', { 
           headers,
         });
         
@@ -223,9 +222,8 @@ const DashboardLayout: React.FC = () => {
       }
       
       // Save onboarding completion
-      const res = await fetch('/api/preferences', {
+      const res = await apiFetch('/api/preferences', {
         method: 'POST',
-        credentials: 'include',
         headers,
         body: JSON.stringify({
           preferences: {
@@ -239,8 +237,7 @@ const DashboardLayout: React.FC = () => {
         setOnboardingCompleted(true);
         
         try {
-          const verifyRes = await fetch('/api/preferences', {
-            credentials: 'include',
+          const verifyRes = await apiFetch('/api/preferences', {
             headers,
           });
           
@@ -490,7 +487,7 @@ const DashboardLayout: React.FC = () => {
             computeUnreadCount();
             toast.error(message?.message || 'Your account data has been deleted.');
             setSession(null);
-            fetch('/api/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+            apiFetch('/api/logout', { method: 'POST' }).catch(() => {});
             setTimeout(() => {
               window.location.href = '/';
             }, 1500);
@@ -649,7 +646,7 @@ const DashboardLayout: React.FC = () => {
 
   const handleLogout = () => {
     try {
-      fetch('/api/logout', { method: 'POST', credentials: 'include' }).catch(() => {});
+      apiFetch('/api/logout', { method: 'POST' }).catch(() => {});
     } finally {
     setSession(null);
       toast.success('Logged out');
@@ -850,8 +847,7 @@ const DashboardLayout: React.FC = () => {
           }
 
           try {
-            const verifyRes = await fetch('/api/preferences', {
-              credentials: 'include',
+            const verifyRes = await apiFetch('/api/preferences', {
               headers,
             });
 

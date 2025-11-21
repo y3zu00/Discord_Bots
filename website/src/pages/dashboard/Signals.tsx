@@ -485,7 +485,7 @@ const Signals: React.FC = () => {
       const updates: Record<string, string | null> = {};
       for (const sym of toFetch) {
         try {
-          const res = await fetch(`/api/asset-search?query=${encodeURIComponent(sym)}`, { credentials: "include" });
+          const res = await apiFetch(`/api/asset-search?query=${encodeURIComponent(sym)}`);
           if (!res.ok) throw new Error(`asset search failed for ${sym}`);
           const data = await res.json();
           const list = Array.isArray(data?.items) ? data.items : [];
@@ -773,7 +773,7 @@ const Signals: React.FC = () => {
   const confirmDeleteSignal = async () => {
     if (!pendingDelete) return;
     try {
-      const res = await fetch(`/api/signals/${pendingDelete.id}`, { method: "DELETE", credentials: "include" });
+      const res = await apiFetch(`/api/signals/${pendingDelete.id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("delete_failed");
       setItems((prev) => prev.filter((signal) => signal.id !== pendingDelete.id));
       toast.success(`${pendingDelete.symbol} deleted`);

@@ -449,7 +449,7 @@ const Notifications: React.FC = () => {
 
   const deleteGlobal = async (id: number) => {
     try {
-      const res = await fetch(`/api/announcements/${id}`, { method: 'DELETE', credentials: 'include' });
+      const res = await apiFetch(`/api/announcements/${id}`, { method: 'DELETE' });
       if (res.ok) {
         setAnnouncements((prev) => prev.filter(a => a.id !== id));
         const key = `announcement:${id}`;
@@ -482,9 +482,8 @@ const Notifications: React.FC = () => {
       return;
     }
     try {
-      const res = await fetch(`/api/alerts/${idNum}`, {
+      const res = await apiFetch(`/api/alerts/${idNum}`, {
         method: 'PATCH',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ active: true }),
       });

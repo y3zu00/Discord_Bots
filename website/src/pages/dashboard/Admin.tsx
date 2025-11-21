@@ -114,14 +114,14 @@ const Admin: React.FC = () => {
 
   const deleteAnnouncement = async (id: number) => {
     try {
-      const res = await fetch(`/api/announcements/${id}`, { method: 'DELETE', credentials: 'include' });
+      const res = await apiFetch(`/api/announcements/${id}`, { method: 'DELETE' });
       if (res.ok) { toast.success('Deleted'); loadAll(); }
     } catch {}
   };
 
   const updateUser = async (discordId: string, changes: any) => {
     try {
-      const res = await fetch(`/api/admin/users/${discordId}`, { method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(changes) });
+      const res = await apiFetch(`/api/admin/users/${discordId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(changes) });
       if (res.ok) { toast.success('Updated'); loadAll(); }
       else toast.error('Failed');
     } catch { toast.error('Failed'); }
@@ -161,9 +161,8 @@ const Admin: React.FC = () => {
   const updateUserFeedbackStatus = async (id: number, status: string, notes?: string) => {
     setUpdatingFeedbackId(id);
     try {
-      const res = await fetch(`/api/admin/feedback/${id}`, {
+      const res = await apiFetch(`/api/admin/feedback/${id}`, {
         method: 'PATCH',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, resolutionNotes: notes }),
       });
@@ -201,7 +200,7 @@ const Admin: React.FC = () => {
   const deleteUserFeedback = async (id: number) => {
     if (!window.confirm('Delete this feedback? This cannot be undone.')) return;
     try {
-      const res = await fetch(`/api/admin/feedback/${id}`, { method: 'DELETE', credentials: 'include' });
+      const res = await apiFetch(`/api/admin/feedback/${id}`, { method: 'DELETE' });
       if (res.ok) { toast.success('Deleted'); loadAll(); setUserFeedbackDialogOpen(false); }
       else toast.error('Failed');
     } catch { toast.error('Failed'); }
@@ -210,7 +209,7 @@ const Admin: React.FC = () => {
   const deleteMentorFeedback = async (id: number) => {
     if (!window.confirm('Delete this feedback? This cannot be undone.')) return;
     try {
-      const res = await fetch(`/api/admin/mentor-feedback/${id}`, { method: 'DELETE', credentials: 'include' });
+      const res = await apiFetch(`/api/admin/mentor-feedback/${id}`, { method: 'DELETE' });
       if (res.ok) { toast.success('Deleted'); loadAll(); setMentorFeedbackDialogOpen(false); }
       else toast.error('Failed');
     } catch { toast.error('Failed'); }

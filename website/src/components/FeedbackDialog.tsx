@@ -15,6 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { apiFetch } from "@/lib/api";
 
 type FeedbackDialogProps = {
   open: boolean;
@@ -99,9 +100,8 @@ const FeedbackDialog: React.FC<FeedbackDialogProps> = ({ open, onOpenChange }) =
 
     setSubmitting(true);
     try {
-      const res = await fetch('/api/feedback', {
+      const res = await apiFetch('/api/feedback', {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           category,

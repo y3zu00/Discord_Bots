@@ -501,7 +501,7 @@ const Account: React.FC = () => {
   const handlePortfolioDelete = useCallback(async (id: number) => {
     if (!window.confirm('Remove this position?')) return;
     try {
-      const res = await fetch(`/api/portfolio/${id}`, { method: 'DELETE', credentials: 'include' });
+      const res = await apiFetch(`/api/portfolio/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('failed');
       await loadPortfolio();
       toast.success('Position removed');

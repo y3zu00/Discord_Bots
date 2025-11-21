@@ -136,7 +136,7 @@ const Prices: React.FC = () => {
 
   const fetchEthBtc = useCallback(async () => {
     try {
-      const r = await fetch(`/api/coins?symbols=BTC,ETH&_=${Date.now()}`, { credentials: 'include', cache: 'no-store' });
+      const r = await apiFetch(`/api/coins?symbols=BTC,ETH&_=${Date.now()}`, { cache: 'no-store' });
       if (!r.ok) throw new Error('failed');
       const d = await r.json();
       const items = Array.isArray(d?.items) ? d.items : [];
@@ -244,7 +244,7 @@ const Prices: React.FC = () => {
     (async () => {
       setLoadingC(true);
       try {
-        const res = await fetch(`/api/prices/crypto?limit=100&_=${Date.now()}`, { credentials: 'include', cache: 'no-store' });
+        const res = await apiFetch(`/api/prices/crypto?limit=100&_=${Date.now()}`, { cache: 'no-store' });
         const data = await res.json();
         if (!cancelled) setCrypto(data?.items || []);
       } finally { if (!cancelled) setLoadingC(false); }
@@ -258,7 +258,7 @@ const Prices: React.FC = () => {
 
     (async () => {
       try {
-        const res = await fetch(`/api/metrics?_=${Date.now()}`, { credentials: 'include', cache: 'no-store' });
+        const res = await apiFetch(`/api/metrics?_=${Date.now()}`, { cache: 'no-store' });
         const data = await res.json();
         if (!cancelled) {
           setMetrics(data || null);

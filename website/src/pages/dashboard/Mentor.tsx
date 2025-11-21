@@ -1098,7 +1098,7 @@ const Mentor: React.FC = () => {
   const handlePortfolioDelete = useCallback(async (id: number) => {
     if (!window.confirm('Remove this position?')) return;
     try {
-      const res = await fetch(`/api/portfolio/${id}`, { method: 'DELETE', credentials: 'include' });
+      const res = await apiFetch(`/api/portfolio/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('failed');
       await loadPortfolio();
       toast.success('Position removed');
@@ -2724,9 +2724,8 @@ const Mentor: React.FC = () => {
             <Button disabled={profileSaving} onClick={async () => {
               setProfileSaving(true);
               try {
-                const res = await fetch('/api/profile/trading', {
+                const res = await apiFetch('/api/profile/trading', {
                   method: 'POST',
-                  credentials: 'include',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ profile: profileForm }),
                 });

@@ -136,7 +136,7 @@ const Alerts: React.FC = () => {
     if (unique.length === 0) return;
     (async () => {
       try {
-        const res = await fetch(`/api/coins?symbols=${encodeURIComponent(unique.join(','))}`, { credentials: 'include' });
+        const res = await apiFetch(`/api/coins?symbols=${encodeURIComponent(unique.join(','))}`);
         const data = await res.json();
         if (Array.isArray(data?.items)) {
           const logos: Record<string, string | null> = {};
@@ -254,7 +254,7 @@ const Alerts: React.FC = () => {
     const previous = alerts;
     setAlerts((prev) => prev.filter(a => a.id !== id));
     try {
-      const res = await fetch(`/api/alerts/${id}`, { method: 'DELETE', credentials: 'include' });
+      const res = await apiFetch(`/api/alerts/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('request_failed');
       toast.success('Alert removed');
       await loadAlerts(false);
@@ -273,9 +273,8 @@ const Alerts: React.FC = () => {
     const nextActive = !alert.active;
     setAlerts((prev) => prev.map((x) => String(x.id) === alertId ? { ...x, active: nextActive } : x));
     try {
-      const res = await fetch(`/api/alerts/${alertId}`, {
+      const res = await apiFetch(`/api/alerts/${alertId}`, {
         method: 'PATCH',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ active: nextActive }),
       });
@@ -652,9 +651,8 @@ const Alerts: React.FC = () => {
                   };
                   if (editingId) {
                     try {
-                      const res = await fetch(`/api/alerts/${editingId}`, {
+                      const res = await apiFetch(`/api/alerts/${editingId}`, {
                         method: 'PATCH',
-                        credentials: 'include',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                           symbol: item.symbol,
