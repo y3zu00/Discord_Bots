@@ -87,7 +87,11 @@ const {
 
 const DISCORD_FEEDBACK_WEBHOOK = process.env.DISCORD_FEEDBACK_WEBHOOK_URL || process.env.DISCORD_FEEDBACK_WEBHOOK;
 
-const COOKIE_SECURE = (process.env.NODE_ENV || 'development') !== 'development';
+const frontendIsLocal = /^https?:\/\/(localhost|127\.0\.0\.1)/i.test(FRONTEND_URL ?? '');
+const COOKIE_SECURE =
+  process.env.COOKIE_SECURE === 'true' ||
+  (process.env.NODE_ENV || 'development') === 'production' ||
+  (!frontendIsLocal && /^https:\/\//i.test(FRONTEND_URL ?? ''));
 
 // Neon SQL helper
 function getNeonSql() {
