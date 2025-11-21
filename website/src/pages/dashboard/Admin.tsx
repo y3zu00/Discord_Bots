@@ -115,8 +115,17 @@ const Admin: React.FC = () => {
   const deleteAnnouncement = async (id: number) => {
     try {
       const res = await apiFetch(`/api/announcements/${id}`, { method: 'DELETE' });
-      if (res.ok) { toast.success('Deleted'); loadAll(); }
-    } catch {}
+      if (res.ok) { 
+        toast.success('Deleted'); 
+        loadAll(); 
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data?.error || 'Delete failed');
+      }
+    } catch (err) {
+      console.error('Failed to delete announcement', err);
+      toast.error('Failed to delete announcement');
+    }
   };
 
   const updateUser = async (discordId: string, changes: any) => {

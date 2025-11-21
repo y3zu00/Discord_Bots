@@ -142,10 +142,24 @@ app.delete('/api/announcements/:id', async (req, res) => {
     const u = getSessionUser(req);
     if (!u || !u.isAdmin) return res.status(403).json({ ok: false, error: 'forbidden' });
     const id = Number(req.params.id);
-    const sql = getNeonSql(); if (!sql) return res.status(500).json({ ok: false, error: 'db' });
+    if (!Number.isFinite(id) || id <= 0) {
+      return res.status(400).json({ ok: false, error: 'invalid_id' });
+    }
+    const sql = getNeonSql(); 
+    if (!sql) return res.status(500).json({ ok: false, error: 'db' });
+    await ensureAnnouncements(sql);
+    
+    // Check if announcement exists before deleting
+    const existing = await sql`SELECT id FROM announcements WHERE id=${id}`;
+    if (!existing || existing.length === 0) {
+      return res.status(404).json({ ok: false, error: 'not_found' });
+    }
+    
     await sql`DELETE FROM announcements WHERE id=${id}`;
     return res.json({ ok: true });
-  } catch (e) { return res.status(500).json({ ok: false, error: e?.message || 'err' }); }
+  } catch (e) { 
+    return res.status(500).json({ ok: false, error: e?.message || 'err' }); 
+  }
 });
 
 // ----------------------------
