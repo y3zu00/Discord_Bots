@@ -4,6 +4,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
+import https from 'https';
 import path from 'path';
 import { WebSocketServer, WebSocket as WSClient } from 'ws';
 import crypto from 'crypto';
@@ -22,6 +23,10 @@ app.use((req, res, next) => {
     'http://localhost:5173',
     'https://discord-bots-zodl.vercel.app',
     'https://discord-bots-zodl-git-main-y3zu00s-projects.vercel.app',
+    'https://app.jackofalltrades.vip',
+    'https://docs.jackofalltrades.vip',
+    'https://www.jackofalltrades.vip',
+    'https://jackofalltrades.vip',
     ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [])
   ];
   
@@ -3785,7 +3790,23 @@ app.post('/api/logout', (req, res) => {
 });
 
 const PORT = process.env.PORT || 8787;
-const server = app.listen(PORT, () => console.log(`Auth server listening on :${PORT}`));
+const HTTPS_PORT = process.env.HTTPS_PORT || 443;
+
+const sslCertPath = process.env.SSL_CERT_PATH || '/etc/letsencrypt/live/app.jackofalltrades.vip/fullchain.pem';
+const sslKeyPath = process.env.SSL_KEY_PATH || '/etc/letsencrypt/live/app.jackofalltrades.vip/privkey.pem';
+
+let server;
+if (fs.existsSync(sslCertPath) && fs.existsSync(sslKeyPath)) {
+  const httpsOptions = {
+    cert: fs.readFileSync(sslCertPath),
+    key: fs.readFileSync(sslKeyPath),
+  };
+  server = https.createServer(httpsOptions, app);
+  server.listen(HTTPS_PORT, () => console.log(`HTTPS server listening on :${HTTPS_PORT}`));
+  app.listen(PORT, () => console.log(`HTTP server listening on :${PORT}`));
+} else {
+  server = app.listen(PORT, () => console.log(`Auth server listening on :${PORT}`));
+}
 
 // ----------------------------
 // WebSocket: Crypto price fan-out
