@@ -37,7 +37,7 @@ Automated Discord bot that pulls the most important article from our first‑par
    npm start
    ```
 
-On boot it immediately posts one article, then schedules every four hours (`0 */4 * * *`). Logs indicate which provider supplied the article.
+On boot it immediately posts one article, then schedules every six hours (`0 */6 * * *`). Logs indicate which provider supplied the article.
 
 ## File structure
 

@@ -28,7 +28,7 @@ const DIRECTION_EMOJIS = {
   volatile: "⚠️",
   watch: "🛰️",
 };
-const FOUR_HOUR_CRON = "0 */4 * * *";
+const SIX_HOUR_CRON = "0 */6 * * *";
 const MIN_NEWS_SCORE = 45;
 const MIN_SUMMARY_LENGTH = 70;
 
@@ -730,7 +730,7 @@ client.once("ready", async () => {
     return;
   }
 
-  cron.schedule(FOUR_HOUR_CRON, () => {
+  cron.schedule(SIX_HOUR_CRON, () => {
     sendNewsUpdate("schedule");
   });
 });
