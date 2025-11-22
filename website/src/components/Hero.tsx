@@ -96,12 +96,15 @@ const Hero = () => {
                     <Button 
                       size="lg" 
                       className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-lg px-10 py-6 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 relative overflow-hidden group"
+                      asChild
                     >
-                      <span className="relative z-10">Start Free Trial</span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                      <div className="ml-3 flex items-center justify-center w-8 h-8 rounded-full bg-primary-foreground/20 group-hover:bg-primary-foreground/30 transition-colors duration-300 relative z-10">
-                        <ArrowUpRight className="h-5 w-5 group-hover:rotate-45 transition-transform duration-300" />
-                      </div>
+                      <a href="https://whop.com/jack-of-all-trades-official" target="_blank" rel="noopener noreferrer" className="flex items-center relative z-10">
+                        <span className="relative z-10">Start Free Trial</span>
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                        <div className="ml-3 flex items-center justify-center w-8 h-8 rounded-full bg-primary-foreground/20 group-hover:bg-primary-foreground/30 transition-colors duration-300 relative z-10">
+                          <ArrowUpRight className="h-5 w-5 group-hover:rotate-45 transition-transform duration-300" />
+                        </div>
+                      </a>
                     </Button>
                   </MagneticButton>
                   

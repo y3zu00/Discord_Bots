@@ -176,12 +176,14 @@ const Navbar = () => {
           <Button 
             size="sm"
             className="hidden md:flex bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full px-6"
-            onClick={(e) => { e.preventDefault(); const el = document.getElementById('pricing'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }}
+            asChild
           >
-            Start Free Trial
-            <div className="ml-2 flex items-center justify-center w-6 h-6 rounded-full bg-primary-foreground/20">
-              <ArrowUpRight className="h-4 w-4" />
-            </div>
+            <a href="https://whop.com/jack-of-all-trades-official" target="_blank" rel="noopener noreferrer" className="flex items-center">
+              Start Free Trial
+              <div className="ml-2 flex items-center justify-center w-6 h-6 rounded-full bg-primary-foreground/20">
+                <ArrowUpRight className="h-4 w-4" />
+              </div>
+            </a>
           </Button>
 
           {/* Mobile Menu Button */}
@@ -263,12 +265,14 @@ const Navbar = () => {
               <Button 
                 size="sm"
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full px-6"
-                onClick={(e) => { e.preventDefault(); const el = document.getElementById('pricing'); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } setIsMobileMenuOpen(false); }}
+                asChild
               >
-                Start Free Trial
-                <div className="ml-2 flex items-center justify-center w-6 h-6 rounded-full bg-primary-foreground/20">
-                  <ArrowUpRight className="h-4 w-4" />
-                </div>
+                <a href="https://whop.com/jack-of-all-trades-official" target="_blank" rel="noopener noreferrer" className="flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                  Start Free Trial
+                  <div className="ml-2 flex items-center justify-center w-6 h-6 rounded-full bg-primary-foreground/20">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </div>
+                </a>
               </Button>
             </div>
           </div>
