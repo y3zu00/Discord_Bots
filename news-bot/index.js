@@ -28,12 +28,16 @@ const DIRECTION_EMOJIS = {
   volatile: "⚠️",
   watch: "🛰️",
 };
-const SIX_HOUR_CRON = "0 */6 * * *";
+const rawNewsCronHours = parseInt(process.env.NEWS_CRON_HOURS || "12", 10);
+const NEWS_CRON_HOURS = Number.isFinite(rawNewsCronHours) && rawNewsCronHours >= 1 && rawNewsCronHours <= 24
+  ? rawNewsCronHours
+  : 12;
+const NEWS_CRON = `0 */${NEWS_CRON_HOURS} * * *`;
 const MIN_NEWS_SCORE = 45;
 const MIN_SUMMARY_LENGTH = 70;
 
 const REQUIRED_ENV = ["DISCORD_TOKEN", "NEWS_CHANNEL_ID", "OPENAI_API_KEY"];
-const optionalEnv = ["ALPHA_VANTAGE_KEY", "CRYPTO_PANIC_KEY", "FINNHUB_API_KEY"];
+const optionalEnv = ["ALPHA_VANTAGE_KEY", "CRYPTO_PANIC_KEY", "CRYPTO_PANIC_KEYS", "FINNHUB_API_KEY"];
 const ONE_SHOT = process.env.NEWS_BOT_EXIT_AFTER_POST === "1";
 
 REQUIRED_ENV.forEach((key) => {
@@ -51,6 +55,32 @@ const client = new Client({
 
 const sentHistory = new Set();
 let cycleInProgress = false;
+
+// ----------- CryptoPanic key rotation -----------
+// Allow multiple keys via CRYPTO_PANIC_KEYS (comma-separated) or a single CRYPTO_PANIC_KEY.
+// If none are provided in env, fall back to the built-in keys supplied for this deployment.
+const CRYPTO_PANIC_KEYS = (process.env.CRYPTO_PANIC_KEYS || process.env.CRYPTO_PANIC_KEY || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+if (!CRYPTO_PANIC_KEYS.length) {
+  CRYPTO_PANIC_KEYS.push(
+    "3330343f1514e6a6b8604e77eb60ac4dc3ef3e29",
+    "b246a97bcbad9d123ad6ceec3f3727cb3a7ab9cd",
+    "696bdb7ad7620fa094c7745bc3009fd495d0635c",
+    "b5ca1becede911bfae17e3158f4298f5c763566f",
+    "78ed2dc9b32bf680f6d5546df5debe7e8faf55d5"
+  );
+}
+
+let cryptoPanicKeyIndex = 0;
+function nextCryptoPanicKey() {
+  if (!CRYPTO_PANIC_KEYS.length) return null;
+  const key = CRYPTO_PANIC_KEYS[cryptoPanicKeyIndex];
+  cryptoPanicKeyIndex = (cryptoPanicKeyIndex + 1) % CRYPTO_PANIC_KEYS.length;
+  return key;
+}
 
 async function ensureHistoryFile() {
   try {
@@ -336,41 +366,54 @@ async function fetchAlphaNews() {
 }
 
 async function fetchCryptoPanicNews() {
-  const key = process.env.CRYPTO_PANIC_KEY;
-  if (!key) return [];
-  try {
-    const { data } = await axios.get("https://cryptopanic.com/api/v1/posts/", {
-      params: {
-        auth_token: key,
-        public: "true",
-        kind: "news",
-        currencies: "BTC,ETH,SOL,ADA,MATIC",
-        filter: "important",
-        regions: "en",
-      },
-      timeout: 10000,
-    });
-    const results = Array.isArray(data?.results) ? data.results : [];
-    return results.map((post) =>
-      normalizeArticle({
-        title: post.title || "CryptoPanic headline",
-        summary: post.description || post.metadata?.description || "",
-        url: post.url || (post.id ? `https://cryptopanic.com/news/${post.id}` : undefined),
-        source: post.source?.title || post.domain || "CryptoPanic",
-        publishedAt: post.published_at,
-        tickers: post.currencies?.map((c) => c.code?.toUpperCase()).filter(Boolean) || [],
-        provider: "cryptopanic",
-        metrics: {
-          overallScore: (post.votes?.important || 0) / 10,
-          relevance: post.kind === "news" ? 0.5 : 0.2,
-          tickerScores: [],
+  // Rotate through all available CryptoPanic keys and try each once.
+  if (!CRYPTO_PANIC_KEYS.length) return [];
+
+  for (let attempt = 0; attempt < CRYPTO_PANIC_KEYS.length; attempt++) {
+    const key = nextCryptoPanicKey();
+    if (!key) break;
+
+    try {
+      const { data } = await axios.get("https://cryptopanic.com/api/v1/posts/", {
+        params: {
+          auth_token: key,
+          public: "true",
+          kind: "news",
+          currencies: "BTC,ETH,SOL,ADA,MATIC",
+          filter: "important",
+          regions: "en",
         },
-      })
-    );
-  } catch (err) {
-    console.warn("⚠️ CryptoPanic news failed:", err.message);
-    return [];
+        timeout: 10000,
+      });
+      const results = Array.isArray(data?.results) ? data.results : [];
+      return results.map((post) =>
+        normalizeArticle({
+          title: post.title || "CryptoPanic headline",
+          summary: post.description || post.metadata?.description || "",
+          url: post.url || (post.id ? `https://cryptopanic.com/news/${post.id}` : undefined),
+          source: post.source?.title || post.domain || "CryptoPanic",
+          publishedAt: post.published_at,
+          tickers: post.currencies?.map((c) => c.code?.toUpperCase()).filter(Boolean) || [],
+          provider: "cryptopanic",
+          metrics: {
+            overallScore: (post.votes?.important || 0) / 10,
+            relevance: post.kind === "news" ? 0.5 : 0.2,
+            tickerScores: [],
+          },
+        })
+      );
+    } catch (err) {
+      const status = err?.response?.status;
+      const msg = err?.message || String(err);
+      const tail = typeof key === "string" && key.length >= 4 ? key.slice(-4) : "****";
+      console.warn(`⚠️ CryptoPanic news failed with key ****${tail} (status ${status ?? "n/a"}):`, msg);
+      // Try the next key on any failure.
+      continue;
+    }
   }
+
+  console.warn("⚠️ All CryptoPanic keys failed; skipping CryptoPanic feed this cycle.");
+  return [];
 }
 
 async function fetchFinnhubNews() {
@@ -723,6 +766,7 @@ client.once("ready", async () => {
   });
 
   await loadHistory();
+  console.log(`🕒 News cycle configured every ${NEWS_CRON_HOURS}h via cron "${NEWS_CRON}".`);
   await sendNewsUpdate("startup");
 
   if (ONE_SHOT) {
@@ -730,7 +774,7 @@ client.once("ready", async () => {
     return;
   }
 
-  cron.schedule(SIX_HOUR_CRON, () => {
+  cron.schedule(NEWS_CRON, () => {
     sendNewsUpdate("schedule");
   });
 });

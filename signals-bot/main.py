@@ -3763,6 +3763,7 @@ class JackOfAllSignalsBot:
                 # Prepare files list - ensure files exist and are readable
                 files = []
                 file_handles = []
+                chart_sent = False
                 try:
                     # Verify and open candlestick chart - ensure file is complete and readable
                     if candle_chart_path and os.path.exists(candle_chart_path):
@@ -3793,6 +3794,7 @@ class JackOfAllSignalsBot:
                             allowed_mentions=allowed_mentions,
                             view=self.ChannelSignalActionsView(),
                         )
+                        chart_sent = True
                 finally:
                     # Close file handles after sending
                     for fh in file_handles:
@@ -3837,9 +3839,15 @@ class JackOfAllSignalsBot:
                     logging.error(f"Failed to send signal message for {candidate['symbol']}: {send_err}")
                     return
             finally:
+                # Clean up chart file after sending (file handles are already closed in inner finally)
+                # Small delay to ensure Discord has fully processed the file before deletion
                 if candle_chart_path:
                     try:
-                        os.remove(candle_chart_path)
+                        # If chart was sent, wait a moment before cleanup to ensure Discord processed it
+                        if chart_sent:
+                            await asyncio.sleep(0.5)
+                        if os.path.exists(candle_chart_path):
+                            os.remove(candle_chart_path)
                     except Exception:
                         pass
 

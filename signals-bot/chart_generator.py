@@ -90,46 +90,82 @@ def generate_stock_chart(symbol: str, days: int = 30) -> str:
 
 def generate_signal_chart(symbol: str, price_data: dict) -> str:
     """
-    Generate a single, high-detail candlestick chart for the trading signal.
+    Generate a chart for the trading signal with automatic fallback.
+    
+    Tries candlestick chart first (if mplfinance available), then falls back
+    to line chart if candlestick fails for any reason.
     
     Args:
         symbol: Stock or crypto symbol
         price_data: Dictionary containing price and pivot data
         
     Returns:
-        Path to the generated candlestick chart (or None if generation fails)
+        Path to the generated chart image (or None if generation fails completely)
     """
     # Create charts directory if it doesn't exist
     os.makedirs('charts', exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     candle_chart_path = f'charts/{symbol}_candle_{timestamp}.png'
+    line_chart_path = f'charts/{symbol}_line_{timestamp}.png'
     
-    candle_path = None
-    
+    # Fetch historical data once - we'll reuse it for both chart types
+    data = None
     try:
-        if not MPLFINANCE_AVAILABLE:
-            print("mplfinance is required for candlestick chart generation but is not available.")
-            return None
-        
         ticker = yf.Ticker(symbol)
         
         # Request an extended window of data for richer context
-        candle_data = ticker.history(period="180d", interval="1d")
+        data = ticker.history(period="180d", interval="1d")
         
         # Fallback: if yfinance returns limited data (e.g., new IPO), try a shorter window
-        if candle_data.empty or len(candle_data) < 30:
-            candle_data = ticker.history(period="90d", interval="1d")
+        if data.empty or len(data) < 30:
+            data = ticker.history(period="90d", interval="1d")
         
-        if candle_data.empty or len(candle_data) < 5:
-            print(f"No usable candlestick data returned for {symbol}")
+        # Last resort: very short window just so we have something to plot
+        if data.empty or len(data) < 5:
+            data = ticker.history(period="30d", interval="1d")
+        
+        if data.empty or len(data) < 5:
+            print(f"No usable historical data returned for {symbol}")
             return None
-        
-        # Generate detailed candlestick chart
-        candle_path = _generate_candlestick_chart_dark(symbol, candle_data, price_data, candle_chart_path)
     except Exception as e:
-        print(f"Error generating candlestick chart for {symbol}: {e}")
+        print(f"Error fetching historical data for {symbol}: {e}")
+        return None
     
-    return candle_path
+    # Try candlestick chart first (if mplfinance is available)
+    if MPLFINANCE_AVAILABLE:
+        try:
+            candle_path = _generate_candlestick_chart_dark(symbol, data, price_data, candle_chart_path)
+            if candle_path and os.path.exists(candle_path):
+                file_size = os.path.getsize(candle_path)
+                if file_size > 1000:  # Match the threshold in main.py
+                    print(f"Successfully generated candlestick chart for {symbol}: {candle_path}")
+                    return candle_path
+                else:
+                    print(f"Candlestick chart file too small ({file_size} bytes) for {symbol}, falling back to line chart")
+            else:
+                print(f"Candlestick chart generation returned no path for {symbol}, falling back to line chart")
+        except Exception as e:
+            print(f"Error generating candlestick chart for {symbol}: {e}")
+            print("Falling back to line chart")
+    else:
+        print(f"mplfinance not available for {symbol}, using line chart fallback")
+    
+    # Fallback: generate line chart using the same data
+    try:
+        line_path = _generate_line_chart_dark(symbol, data, price_data, line_chart_path)
+        if line_path and os.path.exists(line_path):
+            file_size = os.path.getsize(line_path)
+            if file_size > 1000:  # Match the threshold in main.py
+                print(f"Successfully generated line chart for {symbol}: {line_path}")
+                return line_path
+            else:
+                print(f"Line chart file too small ({file_size} bytes) for {symbol}")
+        else:
+            print(f"Line chart generation returned no path for {symbol}")
+    except Exception as e:
+        print(f"Error generating fallback line chart for {symbol}: {e}")
+    
+    return None
 
 def _generate_line_chart_dark(symbol: str, data: pd.DataFrame, price_data: dict, chart_path: str) -> str:
     """Generate enhanced line chart with dark theme, branding, and better detail."""
