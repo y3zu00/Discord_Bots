@@ -27,10 +27,30 @@ import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
 
+const isBrowser = typeof window !== "undefined";
+const hostname = isBrowser ? window.location.hostname : "";
+const isDocsSubdomain = hostname === "docs.jackofalltrades.vip";
+const isAppSubdomain = hostname === "app.jackofalltrades.vip";
+
 const App = () => {
   React.useEffect(() => {
     // Try to hydrate session from server cookie on first load
     syncSessionFromServer();
+  }, []);
+
+  React.useEffect(() => {
+    if (!isBrowser) return;
+
+    // Force docs subdomain to the docs route
+    if (isDocsSubdomain && window.location.pathname !== "/docs") {
+      window.location.replace("/docs");
+      return;
+    }
+
+    // Force app subdomain root to dashboard (auth gate handled by ProtectedRoute)
+    if (isAppSubdomain && window.location.pathname === "/") {
+      window.location.replace("/dashboard");
+    }
   }, []);
 
   return (
